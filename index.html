@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>Mood Locator</title>
+    <script
+          src="https://code.jquery.com/jquery-3.2.1.min.js"
+          integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+          crossorigin="anonymous"></script>
+    <link href="main.css" rel="stylesheet" type="text/css" />
+  </head>
+
+  <body> 
+    <header>
+      <img class="home-button"> 
+    </header>
+
+
+ <!-- LOGIN PAGE LOGIN PAGE LOGIN PAGE 
+    <section id="login">
+      <div class="login-container">
+        <label for="username"><b>Username</b></label>
+        <input type="text" placeholder="Enter Username" name="uname" required>
+
+        <label for="password"><b>Password</b></label>
+        <input type="text" placeholder="Enter Password" name="pwd" required>
+
+        <button type="submit">Login</button>   
+      </div>
+    </section>
+  -->
+
+
+
+<!-- PROFILE PAGE PROFILE PAGE PROFILE PAGE -->
+    <section id="graph">
+      <div class="graph-container"> 
+        <!-- enter graph in here -->
+        <p>placeholder</p>
+      </div>
+    </section>
+    <section id="profile"> 
+      <div class="info-container">
+        <!-- enter user info here -->
+        <p>placeholder</p>
+      </div>
+      <div class="history container">
+        <!-- enter last update here -->
+        <p>placeholder</p>
+      </div>
+    </section>
+  
+    <!-- NEW MOOD INPUT FIELD-->
+    <section id="new-mood"> 
+      <div class="new-mood-container">
+
+        <!-- mood written description-->
+        <label for="mood-description">Tell me what's up?</label>
+        <input type="text" name="mood-description" class="js-mood-entry" placeholder="e.g., Just had bad coffee" required>
+        <!-- mood rating by number -->
+        <div class="rating-container">
+          <div class="mood-choices">
+            <input type="radio" name="mood" id="choice-1"> 
+            <label for="mood-1">I feel horrible pain/sickness</label>
+
+            <input type="radio" name="mood" id="choice-2"> 
+            <label for="mood-2">I feel down and out</label>
+
+            <input type="radio" name="mood" id="choice-3"> 
+            <label for="mood-3">I feel lethargic</label>
+
+            <input type="radio" name="mood" id="choice-4"> 
+            <label for="mood-4">I feel ok</label>
+
+            <input type="radio" name="mood" id="choice-5"> 
+            <label for="mood-5">I feel good</label>
+
+            <input type="radio" name="mood" id="choice-6"> 
+            <label for="mood-6">I feel like going out</label>
+
+            <input type="radio" name="mood" id="choice-7"> 
+            <label for="mood-7">I feel like I can leap for joy</label>
+          </div>  
+        </div>
+        <!-- submit for both inputs above? -->
+        <button type="submit">Add mood</button>  
+      
+      </div>
+    </section>
+
+<!-- SUCCESS PAGE SUCCESS PAGE SUCCESS PAGE-->
+    <section id="success">
+      <div class="succes-msg-container">
+        <h2>A new instance of mood has been added!  Remember you can add anytime, anywhere!</h2>
+      </div>
+
+      <!-- send user back to profile page -->
+      <a id="go-profile" href="../">Return to my profile</a>
+    </section>
+
+    
+  
+
+    <script src="https://code.jquery.com/jquery.min.js"></script>
+    <script type="text/javascript" src="index.js"></script>
+
+
+
+  </body>
+  </html>
