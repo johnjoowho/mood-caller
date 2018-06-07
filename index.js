@@ -154,7 +154,49 @@ function displayMoodField() {
   $('main').html(generateMoodInput()); 
 }
 
-//login page or landing page -> has link to signup page  
+
+//landing page - has link to signin page 
+function generateSignupPage() {
+  return `
+    <h1>Sign Up</h1> 
+    <form class="signup-form"> 
+      <label for="usrname">Username</label> 
+      <input type="text" placeholder="Enter email" name="usrname" id="newusername"> 
+      <label for="passwrd">Password</label> 
+      <input type="text" placedholer="Enter password" name="passwrd" id="newpassword"> 
+      <button type="submit" id="register-user">REGISTER</button> 
+    </form> 
+      <button onclick="......" type="button" id="showLoginButton">Login for Users</button> 
+  `
+} 
+
+function handleSignupSubmit(event) { 
+  event.preventDefault(); 
+  $('main').on('submit', '.signup-form', function(event) { 
+    event.preventDefault(); 
+    const newUsername = $('#newusername').val(); 
+    const newPassword = $('#newpassword').val(); 
+    const newUser = {username, password}; 
+    function addNewUser(username, password) { 
+      console.log('new user registered'); 
+    }
+  });
+}
+
+
+
+function handleShowLoginButton(event) {
+  $('main').on('click', '#showLoginButton', function(event) { 
+    event.preventDefault(); 
+    displayLoginPage();
+  });  
+} 
+
+function displayLoginPage() {
+  $('main').html(generateLoginPage()); 
+} 
+
+//login page linked from LANDING page 
 function generateLoginPage() {
   return ` 
     <form class="login-form"> 
@@ -167,8 +209,6 @@ function generateLoginPage() {
   `
 } 
 
-function displayLoginPage(); 
-
 function handleLoginSubmit(event) {
   event.preventDefault(); 
   $('main').on('submit', '.login-form', function(event) {
@@ -177,35 +217,23 @@ function handleLoginSubmit(event) {
     const password = $('#login-password').val(); 
     const user = {username, password};
     function validateLogin(username, password) { 
-      console.log(); 
+      console.log('Login validated'); 
     }; 
   STORE.get(displayProfile); 
-}); 
+  }); 
+}
 
 function displayProfile(moods) { 
   $('main').html(generateProfile(moods)); 
 }
-//
-function handleShowLoginButton(event) {
-  displayLoginPage(); 
-} 
 
-function handleLogoutSubmit(event);
-
-function generateSignupPage() {
-  return `
-    singupform 
-    login (needs even handler)
-  `
-} 
+function handleLogoutSubmit(event) {
+  console.log('loggint out'); 
+}
 
 function displaySignupPage() {
   $('main').html(generateSignupPage());
 } 
-
-function handleSignupSubmit(event) { 
-
-}
 
 function setupEventHandlers() { 
   handleLoginSubmit(); 
@@ -219,6 +247,6 @@ function setupEventHandlers() {
 function setupUi() { 
   setupEventHandlers(); 
   displaySignupPage(); 
-};
+}
 
-$(setupUi); 
+$(setupUi);  
