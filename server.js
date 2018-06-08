@@ -7,12 +7,10 @@ const passport = require('passport');
 
 //use different routers for user usage and authentication
 const { router: usersRouter } = require('./users'); 
-const { router: authROuter, localStrategy, jwtStrategy } = require('./auth'); 
-
-mongoose.Promise = global.Promise; 
+const { router: authRouter, localStrategy, jwtStrategy } = require('./auth'); 
+const { router: entriesRouter } = require('./entries'); 
 
 const { DATABASE_URL, PORT } = require('./config'); 
-const { MoodEntry } = require('./models'); 
 
 const app = express(); 
 
@@ -21,6 +19,9 @@ app.use(morgan('common'));
 
 //apply json to entire express app 
 app.use(express.json()); 
+
+//user can access public resource
+app.use(express.static('public'));
 
 //CORS cross-origin resource sharing
 app.use(function(req, res, next) { 
@@ -37,15 +38,10 @@ passport.use(localStrategy);
 passport.use(jwtStrategy); 
 
 app.use('/api/users/', usersRouter); 
-app.use('/api/auth')
+app.use('/api/auth', authRouter); 
+app.use('/api/entries', entriesRouter); 
 
 const jwtAuth = passport.authenticate('jwt', { session: false }); 
-
-app.get('/api/protected', jwtAuth, (req, res) => { 
-  return res.json({
-    data: 
-  });
-})
 
 app.use('*', (req, res) => {
   return res.status(404).json({ message: 'Not Found' });
@@ -100,24 +96,3 @@ module.exports = { app, runServer, closeServer };
 
 
 
-app.get('/posts', (req, res) => { 
-  MoodEntry 
-    .find()
-    .then(entries => { 
-      res.json(entries.map(entry => entry.serialize())); 
-    })
-    .catch(err =>  {
-      console.error(err); 
-      res.status(500).json({ error: 'something went wrong' }); 
-    }); 
-}); 
-
-app.get('/entries/:id', (req, res) => { 
-  MoodEntry 
-    .findById(req.params.id)
-    .then(entry => res.json(entry.serialize())); 
-    .catch(err => { 
-      console.error(err); 
-      res.status(500).json({ error: 'something went wrong' }); 
-    }); 
-}); 
