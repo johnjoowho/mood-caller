@@ -1,26 +1,39 @@
-'use strict' 
+'use strict';
+const bcrypt = require('bcryptjs');
+const mongoose = require('mongoose');
 
-const mongoose = require('mongoose'); 
-mongoose.Promise = global.Promise; 
+mongoose.Promise = global.Promise;
 
-const moodEntrySchema = mongoose.Schema({ 
-  rating: String, 
-  description: String, 
-  timestamp: {type: Date, default: Date.now} 
-}); 
+const UserSchema = mongoose.Schema({
+  username: {
+    type: String,
+    required: true,
+    unique: true
+  },
+  password: {
+    type: String,
+    required: true
+  },
+  firstName: {type: String, default: ''},
+  lastName: {type: String, default: ''}
+});
 
-moodEntrySchema.methods.serialize = function() { 
-  return { 
-    id: this._id, 
-    rating: this.rating, 
-    description: this.description, 
-    created: this.created, 
+UserSchema.methods.serialize = function() {
+  return {
+    username: this.username || '',
+    firstName: this.firstName || '',
+    lastName: this.lastName || ''
   };
 };
 
+UserSchema.methods.validatePassword = function(password) {
+  return bcrypt.compare(password, this.password);
+};
 
+UserSchema.statics.hashPassword = function(password) {
+  return bcrypt.hash(password, 10);
+};
 
-const MoodEntry = mongoose.model('MoodEntry', moodEntrySchema); 
+const User = mongoose.model('User', UserSchema);
 
-module.exports = {MoodEntry}; 
-
+module.exports = {User};
