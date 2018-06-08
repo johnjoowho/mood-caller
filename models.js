@@ -15,5 +15,10 @@ moodEntrySchema.methods.serialize = function() {
     rating: this.rating, 
     description: this.description, 
     created: this.created, 
-  }
-}
+  };
+};
+
+const MoodEntry = mongoose.model('MoodEntry', moodEntrySchema); 
+
+module.exports = {MoodEntry}; 
+
