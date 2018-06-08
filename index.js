@@ -23,7 +23,7 @@ const MoodEntries = {
       rating: mood.rating, 
       id: uuid(), 
       description: mood.description, 
-      timestamp: Date.now(), 
+      created: Date.now(), 
     };
     this.items[item.id] = item; 
     callback(item); 
