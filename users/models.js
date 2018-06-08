@@ -18,6 +18,8 @@ moodEntrySchema.methods.serialize = function() {
   };
 };
 
+
+
 const MoodEntry = mongoose.model('MoodEntry', moodEntrySchema); 
 
 module.exports = {MoodEntry}; 
