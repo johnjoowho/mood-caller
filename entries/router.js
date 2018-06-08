@@ -7,7 +7,6 @@ const router = express.Router();
 
 const jsonParser = bodyParser.json();
 
-mongoose.Promise = global.Promise; 
 
 router.get('/', (req, res) => { 
   MoodEntry 
