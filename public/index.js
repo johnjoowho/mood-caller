@@ -140,6 +140,7 @@ function generateSuccessPage(mood) {
 }
 
 function handleGotoProfileSubmit() {
+  event.preventDefault(); 
   $('main').on('click', '#go-to-profile', function(event) {
     displayProfilePage(); 
   }); 
