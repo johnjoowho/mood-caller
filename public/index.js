@@ -245,7 +245,7 @@ function handleLogoutSubmit() {
 }
 
 function logout() { 
-
+  
 }
 
 function displaySignupPage() {
