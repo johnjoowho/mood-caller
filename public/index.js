@@ -132,7 +132,7 @@ function generateSuccessPage(mood) {
     <section id="success">
       <div class="succes-msg-container">
         <h2>New mood added</h2>
-        <p>You've just added entry with rating: ${mood.rating} at time: ${mood.created.toUTCString()}</p> 
+        <p>You've just added entry with rating: ${mood.rating} at time: ${mood.created.moment().hour()}</p> 
       </div>
       <button id="go-to-profile" type="reset">Go to profile</button> 
     </section>
