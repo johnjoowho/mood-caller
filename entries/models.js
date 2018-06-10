@@ -4,7 +4,7 @@ mongoose.Promise = global.Promise;
 const moodEntrySchema = mongoose.Schema({ 
   rating: String, 
   description: String, 
-  timestamp: {type: Date, default: Date.now}, 
+  created: {type: Date, default: Date.now}, 
   username: String 
 }); 
 

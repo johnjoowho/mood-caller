@@ -59,7 +59,7 @@ function createMoodEntries() {
 
 const STORE = createMoodEntries(); 
 
-function generateProfile(moods) {
+function generateProfilePage(moods) {
   return `
     <section id="graph">
       <div class="graph-container"> 
@@ -132,15 +132,15 @@ function generateSuccessPage(mood) {
     <section id="success">
       <div class="succes-msg-container">
         <h2>New mood added</h2>
-        <p>You've just added entry with rating: ${mood.rating} at time: ${mood.timestamp.toLocalDateString()}</p> 
+        <p>You've just added entry with rating: ${mood.rating} at time: ${mood.created.toUTCString()}</p> 
       </div>
       <button id="go-to-profile" type="reset">Go to profile</button> 
     </section>
   `
 }
 
-function displaySuccess(moods) { 
-  $('main').html(generateSuccessPage(moods));
+function displaySuccessPage(mood) { 
+  $('main').html(generateSuccessPage(mood));
 } 
 
 function handleShowNewMoodButton(event) {
@@ -158,34 +158,37 @@ function displayMoodField() {
 //landing page - has link to signin page 
 function generateSignupPage() {
   return `
-    <h1>Sign Up</h1> 
-    <form class="signup-form"> 
-      <label for="usrname">Username</label> 
-      <input type="text" placeholder="Enter email" name="usrname" id="newusername"> 
-      <label for="passwrd">Password</label> 
-      <input type="text" placedholer="Enter password" name="passwrd" id="newpassword"> 
-      <button type="submit" id="register-user">REGISTER</button> 
-    </form> 
-      <button onclick="......" type="button" id="showLoginButton">Login for Users</button> 
+    
+      <form class="signup-form"> 
+        <fieldset> 
+          <legend>Sign Up</legend> 
+            <label for="usrname">Username</label> 
+            <input type="text" placeholder="Enter email" name="usrname" id="newusername"> 
+            <label for="passwrd">Password</label> 
+            <input type="text" placeholder="Enter password" name="passwrd" id="newpassword"> 
+        </fieldset> 
+        <button type="submit" id="register-user">REGISTER</button> 
+      </form> 
+      <button type="button" id="showLoginButton">Login for Users</button> 
   `
 } 
 
-function handleSignupSubmit(event) { 
-  event.preventDefault(); 
+function handleSignupSubmit() { 
   $('main').on('submit', '.signup-form', function(event) { 
     event.preventDefault(); 
-    const newUsername = $('#newusername').val(); 
-    const newPassword = $('#newpassword').val(); 
+    const username = $('#newusername').val(); 
+    const password = $('#newpassword').val(); 
     const newUser = {username, password}; 
-    function addNewUser(username, password) { 
-      console.log('new user registered'); 
-    }
+    addNewUser(newUser, displayProfilePage); 
   });
 }
 
+function addNewUser(newUser, callback) { 
+  STORE.get(callback); 
+}
 
 
-function handleShowLoginButton(event) {
+function handleShowLoginButton() {
   $('main').on('click', '#showLoginButton', function(event) { 
     event.preventDefault(); 
     displayLoginPage();
@@ -209,8 +212,7 @@ function generateLoginPage() {
   `
 } 
 
-function handleLoginSubmit(event) {
-  event.preventDefault(); 
+function handleLoginSubmit() {
   $('main').on('submit', '.login-form', function(event) {
     event.preventDefault(); 
     const username = $('#login-username').val(); 
@@ -219,16 +221,16 @@ function handleLoginSubmit(event) {
     function validateLogin(username, password) { 
       console.log('Login validated'); 
     }; 
-  STORE.get(displayProfile); 
+    STORE.get(displayProfile); 
   }); 
 }
 
-function displayProfile(moods) { 
-  $('main').html(generateProfile(moods)); 
+function displayProfilePage(moods) { 
+  $('main').html(generateProfilePage(moods)); 
 }
 
-function handleLogoutSubmit(event) {
-  console.log('loggint out'); 
+function handleLogoutSubmit() {
+ 
 }
 
 function displaySignupPage() {
