@@ -75,6 +75,7 @@ function generateProfilePage(moods) {
       </div>
     </section> 
     <button id="create-new-mood">click to log a new mood</button>
+    <button id="log-out">log out</button> 
   `
 }
 
@@ -237,7 +238,14 @@ function displayProfilePage(moods) {
 }
 
 function handleLogoutSubmit() {
- 
+  $('main').on('click', '#log-out', function(event) { 
+    event.preventDefault(); 
+    logout(); 
+  });
+}
+
+function logout() { 
+
 }
 
 function displaySignupPage() {
