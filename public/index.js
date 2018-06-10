@@ -84,7 +84,7 @@ function handleMoodSubmit(event) {
     const description = $('#mood-describe').val(); 
     const rating = $('input[name=mood]:checked').val(); 
     const mood = {rating, description}
-    STORE.create(mood, generateSuccessPage); 
+    STORE.create(mood, displaySuccessPage); 
   })
 }
 
