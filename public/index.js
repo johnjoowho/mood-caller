@@ -248,6 +248,7 @@ function setupEventHandlers() {
   handleLoginSubmit(); 
   handleLogoutSubmit();
   handleSignupSubmit(); 
+  handleGotoProfileSubmit(); 
   handleShowNewMoodButton(); 
   handleMoodSubmit(); 
   handleShowLoginButton(); 
