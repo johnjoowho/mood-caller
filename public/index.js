@@ -139,6 +139,12 @@ function generateSuccessPage(mood) {
   `
 }
 
+function handleGotoProfileSubmit() {
+  $('main').on('click', '#go-to-profile', function(event) {
+    displayProfilePage(); 
+  }); 
+}
+
 function displaySuccessPage(mood) { 
   $('main').html(generateSuccessPage(mood));
 } 
