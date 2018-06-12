@@ -34,7 +34,9 @@ app.use(function(req, res, next) {
   next(); 
 }); 
 
+//registering authentication method in server.js
 passport.use(localStrategy); 
+
 passport.use(jwtStrategy); 
 
 app.use('/api/users/', usersRouter); 
