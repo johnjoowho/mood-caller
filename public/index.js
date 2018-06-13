@@ -64,7 +64,7 @@ function sortByCreated(firstDate, secondDate) {
 }
 
 function getMostRecent(moods, count=5) { 
-  return moods.sort(sortByCreated(firstDate, secondDate)).slice(0, count); 
+  return moods.sort(sortByCreated).slice(0, count); 
 }
 
 function generateGraph(moods) {
