@@ -23,7 +23,7 @@ const MoodEntries = {
       rating: mood.rating, 
       id: uuid(), 
       description: mood.description, 
-      created: Date.now(), 
+      created: new Date(), 
     };
     this.items[item.id] = item; 
     callback(item); 
@@ -59,23 +59,69 @@ function createMoodEntries() {
 
 const STORE = createMoodEntries(); 
 
+function sortByCreated(firstDate, secondDate) {
+  return firstDate > secondDate ? -1: firstDate < secondDate ? 1: 0
+}
+
+function getMostRecent(moods, count=5) { 
+  return moods.sort(sortByCreated(firstDate, secondDate)).slice(0, count); 
+}
+
+function generateGraph(moods) {
+  const ctx = $('#graph-chart').getContext('2d');
+  const chartData = {
+    type: 'line', 
+    labels: moods.map(function(mood) {
+      return mood.created.toLocaleDateString('en-US')
+    }),
+
+    datasets: [{
+      label: 'Rating', 
+      data: moods.map(function(mood) {
+        return mood.rating
+      })
+    }]
+  }
+
+  const myChart = new Chart (ctx, chartData); 
+}
+
 function generateProfilePage(moods) {
-  return `
-    <section id="graph">
-      <div class="graph-container"> 
-        <p>placeholder</p>
-      </div>
-    </section>
-    <section id="profile"> 
+  const mostRecent = getMostRecent(moods); 
+
+  const buttonHtml = `
+    <button id="create-new-mood">click to log a new mood</button>
+    <button id="log-out">log out</button> 
+  ` 
+  const emptyHtml = `
+    <p class="empty-message">Sorry, there are no entries</p> 
+  `
+
+  const graphHtml = `
+  <section id="graph">
+  <div class="graph-container"> 
+    <canvas id="graph-chart"> </canvas> 
+  </div>
+</section>
+  `
+
+  const profileHtml = `
+  <section id="profile"> 
       <div class="info-container">
         <p>placeholder</p>
       </div>
       <div class="history container">
-        <p>placeholder</p>
+        <p>${mostRecent}</p>
       </div>
     </section> 
-    <button id="create-new-mood">click to log a new mood</button>
-    <button id="log-out">log out</button> 
+  `
+
+  return `
+    ${moods.length<1 ? emptyHtml: `${graphHtml} 
+      ${profileHtml}`
+    }
+  
+    ${buttonHtml}
   `
 }
 
@@ -129,11 +175,14 @@ function getMoodsFromApi(success, fail) {
 }
 
 function generateSuccessPage(mood) { 
+  const options = {weekday:'long', year:'numeric', month:'short', day:'2-digit', hour:'2-digit', minute:'2-digit'}; 
+  console.log(mood.created); 
+  console.log(typeof mood.created); 
   return `
     <section id="success">
       <div class="succes-msg-container">
         <h2>New mood added</h2>
-        <p>You've just added entry with rating: ${mood.rating} at time: ${mood.created}</p> 
+        <p>You've just added entry with rating: ${mood.rating} at time: ${mood.created.toLocaleDateString('en-US', options)}</p> 
       </div>
       <button id="go-to-profile" type="button">Go to profile</button> 
     </section>
