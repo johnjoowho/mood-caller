@@ -70,7 +70,7 @@ describe('mood entries API resource', function () {
       //       in db.
       let res;
       return chai.request(app)
-        .get('/entries')
+        .get('/api/entries')
         .then(_res => {
           res = _res;
           res.should.have.status(200);
@@ -91,7 +91,7 @@ describe('mood entries API resource', function () {
 
       let resEntry;
       return chai.request(app)
-        .get('/entries')
+        .get('/api/entries')
         .then(function (res) {
 
           res.should.have.status(200);
@@ -124,12 +124,12 @@ describe('mood entries API resource', function () {
     it('should add a new mood entry', function () {
 
       const newEntry = {
-        rating: faker.rating(), 
-        description: faker.description(),
+        rating: faker.random.number({min: 1, max: 7}), 
+        description: faker.lorem.sentence(),
       };
 
       return chai.request(app)
-        .post('/entries')
+        .post('/api/entries')
         .send(newPost)
         .then(function (res) {
           res.should.have.status(201);
@@ -163,7 +163,6 @@ describe('mood entries API resource', function () {
       const updateData = {
         rating: '6', 
         description: 'I just worked out!', 
-        created: new Date(),
       };
 
       return MoodEntry
@@ -172,7 +171,7 @@ describe('mood entries API resource', function () {
           updateData.id = post.id;
 
           return chai.request(app)
-            .put(`/entries/${post.id}`)
+            .put(`/api/entries/${post.id}`)
             .send(updateData);
         })
         .then(res => {
@@ -201,7 +200,7 @@ describe('mood entries API resource', function () {
         .findOne()
         .then(_post => {
           post = _post;
-          return chai.request(app).delete(`/entries/${post.id}`);
+          return chai.request(app).delete(`/api/entries/${post.id}`);
         })
         .then(res => {
           res.should.have.status(204);

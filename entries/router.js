@@ -31,7 +31,7 @@ router.get('/:id', (req, res) => {
 }); 
 
 router.post('/', (req, res) => {
-  const requiredFields = ['rating', 'description', 'created']; 
+  const requiredFields = ['rating', 'description']; 
   for (let i=0; i<requiredFields.length; i++) {
     const field = requiredFields[i];
     if (!(field in req.body)) {
@@ -44,8 +44,7 @@ router.post('/', (req, res) => {
   MoodEntry 
     .create({
       rating: req.body.rating, 
-      descriptiong: req.body.description, 
-      created: request.body.created}) 
+      description: req.body.description}) 
     .then(
       moodentry => res.status(201).json(moodentry.serialize()))
     .catch(err => {
@@ -66,7 +65,7 @@ router.put('/:id', (req, res) => {
   }
 
   const toUpdate = {}; 
-  const updateableFields = ['rating', 'description', 'created']; 
+  const updateableFields = ['rating', 'description']; 
 
   updateableFields.forEach(field => {
     if (field in req.body) {
