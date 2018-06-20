@@ -31,6 +31,7 @@ function seedMoodEntryData() {
     seedData.push({
       rating: faker.random.number({min: 1, max: 7}), 
       description: faker.lorem.sentence(),
+      username: 'bobby', 
     });
   }
   // this will return a promise
@@ -126,6 +127,7 @@ describe('mood entries API resource', function () {
       const newEntry = {
         rating: faker.random.number({min: 1, max: 7}), 
         description: faker.lorem.sentence(),
+        username: 'bobby', 
       };
 
       return chai.request(app)
