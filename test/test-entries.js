@@ -9,7 +9,7 @@ const mongoose = require('mongoose');
 // this module
 const should = chai.should();
 
-const { MoodEntry } = require('../models');
+const { MoodEntry } = require('../entries');
 const { closeServer, runServer, app } = require('../server'); 
 const { TEST_DATABASE_URL } = require('../config'); 
 
