@@ -4,7 +4,6 @@ mongoose.Promise = global.Promise;
 const moodEntrySchema = mongoose.Schema({ 
   rating: String, 
   description: String, 
-  created: {type: Date, default: Date.now}, 
   username: String 
 }); 
 
@@ -13,7 +12,8 @@ moodEntrySchema.methods.serialize = function() {
     id: this._id, 
     rating: this.rating, 
     description: this.description, 
-    created: this.created, 
+    created: this.createdAt, 
+    updated: this.updatedAt,
     username: this.username
   };
 };

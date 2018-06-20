@@ -29,9 +29,8 @@ function seedMoodEntryData() {
   const seedData = [];
   for (let i = 1; i <= 10; i++) {
     seedData.push({
-      rating: faker.rating.rating(), 
-      description: faker.description.description(),
-      created: faker.created.created()
+      rating: faker.random.number({min: 1, max: 7}), 
+      description: faker.lorem.sentence(),
     });
   }
   // this will return a promise
@@ -127,7 +126,6 @@ describe('mood entries API resource', function () {
       const newEntry = {
         rating: faker.rating(), 
         description: faker.description(),
-        created: faker.created()
       };
 
       return chai.request(app)
