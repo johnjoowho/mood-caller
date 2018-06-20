@@ -101,7 +101,7 @@ describe('mood entries API resource', function () {
 
           res.body.forEach(function (entry) {
             entry.should.be.a('object');
-            entry.should.include.keys('rating', 'description', 'created');
+            entry.should.include.keys('rating', 'description', 'id');
           });
           // just check one of the posts that its values match with those in db
           // and we'll assume it's true for rest
@@ -130,7 +130,7 @@ describe('mood entries API resource', function () {
 
       return chai.request(app)
         .post('/api/entries')
-        .send(newPost)
+        .send(newEntry)
         .then(function (res) {
           res.should.have.status(201);
           res.should.be.json;
@@ -176,7 +176,7 @@ describe('mood entries API resource', function () {
         })
         .then(res => {
           res.should.have.status(204);
-          return BlogPost.findById(updateData.id);
+          return MoodEntry.findById(updateData.id);
         })
         .then(post => {
           post.rating.should.equal(updateData.rating);
