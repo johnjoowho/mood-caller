@@ -5,6 +5,9 @@ const moodEntrySchema = mongoose.Schema({
   rating: String, 
   description: String, 
   username: String 
+}, {
+  timestamps: true, 
+  
 }); 
 
 moodEntrySchema.methods.serialize = function() { 

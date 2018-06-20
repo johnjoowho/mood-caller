@@ -101,7 +101,7 @@ describe('mood entries API resource', function () {
 
           res.body.forEach(function (entry) {
             entry.should.be.a('object');
-            entry.should.include.keys('rating', 'description', 'id');
+            entry.should.include.keys('rating', 'description', 'id', 'created', 'updated', 'username');
           });
           // just check one of the posts that its values match with those in db
           // and we'll assume it's true for rest
@@ -136,7 +136,7 @@ describe('mood entries API resource', function () {
           res.should.be.json;
           res.body.should.be.a('object');
           res.body.should.include.keys(
-            'rating', 'description', 'created');
+            'rating', 'description', 'created', 'updated', 'username', 'id');
           res.body.rating.should.equal(newEntry.title);
           // cause Mongo should have created id on insertion
           res.body.id.should.not.be.null;
