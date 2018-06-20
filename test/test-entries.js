@@ -63,15 +63,15 @@ describe('mood entries API resource', function () {
   // on proving something small
   describe('GET endpoint', function () {
 
-    it('should return all existing posts', function () {
+    it('should return all existing entries', function () {
       // strategy:
-      //    1. get back all posts returned by by GET request to `/posts`
+      //    1. get back all posts returned by by GET request to `/entries`
       //    2. prove res has right status, data type
       //    3. prove the number of posts we got back is equal to number
       //       in db.
       let res;
       return chai.request(app)
-        .get('/posts')
+        .get('/entries')
         .then(_res => {
           res = _res;
           res.should.have.status(200);
@@ -100,9 +100,9 @@ describe('mood entries API resource', function () {
           res.body.should.be.a('array');
           res.body.should.have.lengthOf.at.least(1);
 
-          res.body.forEach(function (post) {
-            post.should.be.a('object');
-            post.should.include.keys('id', 'title', 'content', 'author', 'created');
+          res.body.forEach(function (entry) {
+            entry.should.be.a('object');
+            entry.should.include.keys('rating', 'description', 'created');
           });
           // just check one of the posts that its values match with those in db
           // and we'll assume it's true for rest
@@ -131,7 +131,7 @@ describe('mood entries API resource', function () {
       };
 
       return chai.request(app)
-        .post('/posts')
+        .post('/entries')
         .send(newPost)
         .then(function (res) {
           res.should.have.status(201);
