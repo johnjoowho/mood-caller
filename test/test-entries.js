@@ -31,7 +31,7 @@ function seedMoodEntryData() {
     seedData.push({
       rating: faker.random.number({min: 1, max: 7}), 
       description: faker.lorem.sentence(),
-      username: 'bobby', 
+      username: 'bobby'
     });
   }
   // this will return a promise
