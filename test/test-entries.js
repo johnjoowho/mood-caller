@@ -4,10 +4,12 @@ const chai = require('chai');
 const chaiHttp = require('chai-http');
 const faker = require('faker');
 const mongoose = require('mongoose');
-
+const { User } = require('../users');
 // this makes the should syntax available throughout
 // this module
 const should = chai.should();
+
+let user = null; 
 
 const { MoodEntry } = require('../entries');
 const { closeServer, runServer, app } = require('../server'); 
@@ -31,7 +33,7 @@ function seedMoodEntryData() {
     seedData.push({
       rating: faker.random.number({min: 1, max: 7}), 
       description: faker.lorem.sentence(),
-      username: 'bobby'
+      username: 'Silly'
     });
   }
   // this will return a promise
@@ -45,7 +47,23 @@ describe('mood entries API resource', function () {
   });
 
   beforeEach(function () {
-    return seedMoodEntryData();
+    const username = 'Silly'
+    const password = 'passwordpassword'
+
+    return User.hashPassword(password)
+      .then((hashedPassword) => {
+        return User.create({ username, password : hashedPassword })  
+      })  
+      
+      
+      .then((user) => {
+        return chai.request(app)
+          .post('/api/auth/login')
+          .send({username, password})})
+      .then(res => {
+        user = res.body.authToken;
+        return seedMoodEntryData()
+      })     
   });
 
   afterEach(function () {
@@ -72,6 +90,7 @@ describe('mood entries API resource', function () {
       let res;
       return chai.request(app)
         .get('/api/entries')
+        .set('authorization', `Bearer ${user}`)
         .then(_res => {
           res = _res;
           res.should.have.status(200);
@@ -93,6 +112,7 @@ describe('mood entries API resource', function () {
       let resEntry;
       return chai.request(app)
         .get('/api/entries')
+        .set('authorization', `Bearer ${user}`)
         .then(function (res) {
 
           res.should.have.status(200);
@@ -112,7 +132,7 @@ describe('mood entries API resource', function () {
         .then(post => {
           resEntry.rating.should.equal(post.rating);
           resEntry.description.should.equal(post.description);
-          resEntry.created.should.equal(post.created);
+          resEntry.created.should.equal(post.createdAt.toJSON());
         });
     });
   });
@@ -132,25 +152,24 @@ describe('mood entries API resource', function () {
 
       return chai.request(app)
         .post('/api/entries')
+        .set('authorization', `Bearer ${user}`)
         .send(newEntry)
         .then(function (res) {
           res.should.have.status(201);
           res.should.be.json;
           res.body.should.be.a('object');
           res.body.should.include.keys(
-            'rating', 'description', 'created', 'updated', 'username', 'id');
-          res.body.rating.should.equal(newEntry.title);
+            'rating', 'description', 'created', 'updated', 'id');
+          res.body.rating.should.equal(newEntry.rating);
           // cause Mongo should have created id on insertion
           res.body.id.should.not.be.null;
           res.body.description.should.equal(
             `${newEntry.description}`);
-          res.body.content.should.equal(newPost.content);
-          return BlogPost.findById(res.body.id);
+          return MoodEntry.findById(res.body.id);
         })
         .then(function (post) {
           post.rating.should.equal(newEntry.rating);
-          post.description.should.equal(newEntry.rating);
-          post.created.should.equal(newEntry.created);
+          post.description.should.equal(newEntry.description);
         });
     });
   });
@@ -163,7 +182,7 @@ describe('mood entries API resource', function () {
     //  4. Prove post in db is correctly updated
     it('should update fields you send over', function () {
       const updateData = {
-        rating: '6', 
+        rating: 6, 
         description: 'I just worked out!', 
       };
 
@@ -174,6 +193,7 @@ describe('mood entries API resource', function () {
 
           return chai.request(app)
             .put(`/api/entries/${post.id}`)
+            .set('authorization', `Bearer ${user}`)
             .send(updateData);
         })
         .then(res => {
@@ -182,8 +202,7 @@ describe('mood entries API resource', function () {
         })
         .then(post => {
           post.rating.should.equal(updateData.rating);
-          post.descriptiong.should.equal(updateData.description);
-          post.created.should.equal(updateData.created);
+          post.description.should.equal(updateData.description);
         });
     });
   });
@@ -202,7 +221,8 @@ describe('mood entries API resource', function () {
         .findOne()
         .then(_post => {
           post = _post;
-          return chai.request(app).delete(`/api/entries/${post.id}`);
+          return chai.request(app).delete(`/api/entries/${post.id}`)
+          .set('authorization', `Bearer ${user}`)
         })
         .then(res => {
           res.should.have.status(204);

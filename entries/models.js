@@ -2,12 +2,12 @@ const mongoose = require('mongoose');
 mongoose.Promise = global.Promise; 
 
 const moodEntrySchema = mongoose.Schema({ 
-  rating: String, 
+  rating: Number, 
   description: String, 
   username: String 
 }, {
   timestamps: true, 
-  
+
 }); 
 
 moodEntrySchema.methods.serialize = function() { 

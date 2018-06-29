@@ -1,63 +1,232 @@
-function StorageException(message) {
-  this.message = message;
-  this.name = "StorageException";
-}
+const URL="/api";
+const signupUrl=`${URL}/users`;
+const loginUrl=`${URL}/auth/login`;
+const entriesUrl=`${URL}/entries`;
+let user = null; 
 
-function uuid() {
-  var uuid = "", i, random;
-  for (i = 0; i < 32; i++) {
-    random = Math.random() * 16 | 0;
-
-    if (i == 8 || i == 12 || i == 16 || i == 20) {
-      uuid += "-"
+function addNewUser(newUser, callback) { 
+  const settings = {
+    url: signupUrl,
+    data: JSON.stringify({
+      username: newUser.username, 
+      password: newUser.password
+    }),
+    dataType: 'json',
+    contentType: 'application/json',
+    type: 'POST',
+    success: callback,
+    error: function(error) {
+      alert(`${error.responseJSON.location}: ${error.responseJSON.message}`); 
+      console.dir(error); 
     }
-    uuid += (i == 12 ? 4 : (i == 16 ? (random & 3 | 8) : random)).toString(16);
-  }
-  return uuid;
+  };
+  $.ajax(settings);
 }
 
-const MoodEntries = { 
-  create: function(mood, callback) { 
-    console.log('Creating new mood'); 
-    const item = {
-      rating: mood.rating, 
-      id: uuid(), 
-      description: mood.description, 
-      created: new Date(), 
-    };
-    this.items[item.id] = item; 
-    callback(item); 
-  },
-
-  get: function(callback) { 
-    console.log('Retrieving mood'); 
-    callback(Object.keys(this.items).map(key => this.items[key])); 
-  },
-
-  delete: function(id, callback) { 
-    console.log('Deleting mood entry');
-    delete this.items[id]; 
-    callback(); 
-  }, 
-
-  update: function(updatedItem, callback) {
-    console.log('Updating new mood'); 
-    const {id} = updatedItem; 
-    if (!(id in this.items)) { 
-      throw StorageException(`Can't update item ${id} because it doesn't exist`)
+function getMoodsFromApi(success, id = null) { 
+  const settings = {
+    url: `${entriesUrl}${id? `/${id}` : ''}`,
+    dataType: 'json',
+    type: 'GET',
+    headers: {Authorization: `Bearer ${user}`},
+    success: success,
+    error: function(error) {
+      alert(`Something went wrong: ${error.responseText}`); 
+      console.dir(error); 
     }
-    this.items[updatedItem.id] = updatedItem; 
-    callback(updatedItem); 
+  };
+  $.ajax(settings);
+}
+
+
+function deleteItem(itemId, callback) {
+  const settings = {
+    url: `${entriesUrl}/${itemId}`,
+    dataType: 'json',
+    type: 'DELETE',
+    success: callback,
+    error: function(error) {
+      alert(`Something went wrong: ${error.responseText}`); 
+      console.dir(error); 
+    }
+  };
+  $.ajax(settings); 
+}
+
+function createMoodEntry(item, callback) { 
+  const settings = {
+    headers: {'Authorization': `Bearer ${user}`},
+    url: `${entriesUrl}`,
+    dataType: 'json',
+    contentType: 'application/json',
+    data: JSON.stringify({
+      rating: item.rating,
+      description: item.description
+    }), 
+    type: 'POST',
+    success: callback,
+    error: function(error) {
+      alert(`Something went wrong: ${error.responseText}`); 
+      console.dir(error); 
+    }
+  };
+  console.dir(item);
+  $.ajax(settings); 
+}
+
+function updateItem(itemId, callback) {
+  const settings = {
+    url: `${entriesUrl}/${itemId}`,
+    dataType: 'json',
+    type: 'PUT',
+    success: callback,
+    error: function(error) {
+      alert(`Something went wrong: ${error.responseText}`); 
+      console.dir(error); 
+    }
+  };
+  $.ajax(settings); 
+}
+
+function validateLogin(credentials) { 
+  const settings = {
+    url: loginUrl,
+    data: JSON.stringify({
+      username: credentials.username, 
+      password: credentials.password
+    }),
+    dataType: 'json',
+    contentType: 'application/json',
+    type: 'POST',
+    success: function(data) {
+      user=data.authToken; 
+      displayLandingPage(); 
+    },
+    error: function(error) {
+      alert(`Something went wrong: ${error.responseText}`); 
+      console.dir(error); 
+    }
+  };
+  $.ajax(settings);
+}; 
+
+function logout() { 
+  user = null; 
+  displayLandingPage(); 
+}
+
+function handleShowLoginButton() {
+  $('main').on('click', '#showLoginButton', function(event) { 
+
+    displayLoginPage();
+  });  
+} 
+
+function handleEdit() {
+  $('main').on('click', '#edit-entry', function(event) {
+    const thisId = $(event.currentTarget).data('id');
+
+    updateItem(thisId, displayProfilePage); 
+  });
+}
+
+function handleDelete() {
+    $('body').on('click', '#delete-entry', function(event) { 
+    const thisId = $(event.currentTarget).data('id'); 
+    
+    deleteItem(thisId, displayProfilePage); 
+  });
+}
+
+function handleSignupSubmit() { 
+  $('main').on('submit', '.signup-form', function(event) { 
+    event.preventDefault(); 
+    const username = $('#newusername').val(); 
+    const password = $('#newpassword').val(); 
+    const newUser = {username, password}; 
+    addNewUser(newUser, displayLandingPage); 
+  });
+}
+
+function handleMoodSubmit() { 
+  $('main').on('submit', '#new-mood-form', function(event) {
+    event.preventDefault(); 
+    const description = $('#mood-describe').val(); 
+    const rating = $('input[name=mood]:checked').val(); 
+    const mood = {rating, description};
+    const thisId = $(event.currentTarget).data('id') || null; 
+    const thisCreated = $(event.currentTarget).data('created') || null; 
+    if (thisId && thisCreated) {
+      mood.id = thisId; 
+      mood.created = thisCreated; 
+      updateItem(mood, displayProfilePage); 
+    } else {createMoodEntry(mood, displaySuccessPage);} 
+  });
+}
+
+function handleGotoProfileSubmit() {
+  $('main').on('click', '#go-to-profile', function(event) {
+    getMoodsFromApi(displayProfilePage);
+  }); 
+}
+
+function handleShowNewMoodButton() {
+  $('main').on('click', '#create-new-mood', function(event) {
+    displayMoodField(); 
+  });
+}
+
+function handleLoginSubmit() {
+  $('main').on('submit', '.login-form', function(event) {
+    event.preventDefault(); 
+    const username = $('#login-username').val(); 
+    const password = $('#login-password').val(); 
+    const credentials = {username, password};
+    validateLogin(credentials); 
+    
+  }); 
+}
+
+function handleLogoutSubmit() {
+  $('main').on('click', '#log-out', function(event) { 
+    logout(); 
+  });
+}
+
+function displaySuccessPage(mood) { 
+  $('main').html(generateSuccessPage(mood));
+} 
+
+//mood input field
+function displayMoodField(mood = null) { 
+  $('main').html(generateMoodInput(mood)); 
+}
+
+function displayLoginPage() {
+  $('main').html(generateLoginPage()); 
+} 
+
+
+
+function displayProfilePage(moods) { 
+  $('main').html(generateProfilePage(moods)); 
+  if (moods.length > 0) {
+  generateGraph(moods); 
+  } 
+}
+
+function displaySignupPage() {
+  $('main').html(generateSignupPage());
+} 
+
+//decides which page to start with
+function displayLandingPage() {
+  if (user) { 
+    getMoodsFromApi(displayProfilePage); 
+  } else {
+    displaySignupPage(); 
   }
 }
-
-function createMoodEntries() { 
-  const storage = Object.create(MoodEntries); 
-  storage.items = {}; 
-  return storage; 
-}
-
-const STORE = createMoodEntries(); 
 
 function sortByCreated(firstDate, secondDate) {
   return firstDate > secondDate ? -1: firstDate < secondDate ? 1: 0
@@ -116,6 +285,7 @@ function generateGraph(moods) {
   return new Chart (ctx, chartData); 
 }
 
+
 function generateProfilePage(moods) {
   const mostRecent = getMostRecent(moods); 
 
@@ -172,75 +342,7 @@ function generateProfilePage(moods) {
   `
 }
 
-function handleShowLoginButton() {
-  $('main').on('click', '#showLoginButton', function(event) { 
-
-    displayLoginPage();
-  });  
-} 
-
-function handleEdit() {
-  $('main').on('click', '#edit-entry', function(event) {
-    const thisId = $(event.currentTarget).data('id');
-
-    displayMoodField(STORE.items[thisId]); 
-  });
-}
-
-function handleDelete() {
-    $('body').on('click', '#delete-entry', function(event) { 
-    const thisId = $(event.currentTarget).data('id'); 
-    
-    STORE.delete(thisId, displayLandingPage); 
-  });
-}
-
-function handleSignupSubmit() { 
-  $('main').on('submit', '.signup-form', function(event) { 
-    event.preventDefault(); 
-    const username = $('#newusername').val(); 
-    const password = $('#newpassword').val(); 
-    const newUser = {username, password}; 
-    addNewUser(newUser, displayLandingPage); 
-  });
-}
-
-function handleMoodSubmit() { 
-  $('main').on('submit', '.new-mood-form', function(event) {
-    event.preventDefault(); 
-    const description = $('#mood-describe').val(); 
-    const rating = $('input[name=mood]:checked').val(); 
-    const mood = {rating, description};
-    const thisId = $(event.currentTarget).data('id') || null; 
-    const thisCreated = $(event.currentTarget).data('created') || null; 
-    if (thisId && thisCreated) {
-      mood.id = thisId; 
-      mood.created = thisCreated; 
-      STORE.update(mood, displayLandingPage); 
-    } else {STORE.create(mood, displaySuccessPage);} 
-  });
-}
-
-function handleGotoProfileSubmit() {
-  $('main').on('click', '#go-to-profile', function(event) {
-    getMoodsFromApi(displayProfilePage);
-  }); 
-}
-
-function handleShowNewMoodButton() {
-  $('main').on('click', '#create-new-mood', function(event) {
-    displayMoodField(); 
-  });
-}
-
-function handleLogoutSubmit() {
-  $('main').on('click', '#log-out', function(event) { 
-    logout(); 
-  });
-}
-
 function generateMoodInput(mood = null) {
-  if (mood) console.log(mood.rating);
   return `
     <form id="new-mood-form" ${mood ? `data-id="${mood.id}" data-created="${mood.created}"` : ''}>
         <fieldset> 
@@ -279,39 +381,6 @@ function generateMoodInput(mood = null) {
   `
 }
 
-function getMoodsFromApi(success, fail) { 
-  STORE.get(success)
-}
-
-function generateSuccessPage(mood) { 
-  const options = {weekday:'long', year:'numeric', month:'short', day:'2-digit', hour:'2-digit', minute:'2-digit'}; 
-  console.log(mood.created); 
-  console.log(typeof mood.created); 
-  return `
-    <section id="success">
-      <div class="succes-msg-container">
-        <h2>New mood added</h2>
-        <p>You've just added entry with rating: ${mood.rating} at time: ${mood.created.toLocaleDateString('en-US', options)}</p> 
-      </div>
-      <button id="go-to-profile" type="button">Go to profile</button> 
-    </section>
-  `
-}
-
-
-
-function displaySuccessPage(mood) { 
-  $('main').html(generateSuccessPage(mood));
-} 
-
-
-
-//mood input field
-function displayMoodField(mood = null) { 
-  $('main').html(generateMoodInput(mood)); 
-}
-
-
 //landing page - has link to signin page 
 function generateSignupPage() {
   return `
@@ -321,10 +390,10 @@ function generateSignupPage() {
         <fieldset class="signup-fieldset"> 
           <legend>Sign Up</legend> 
             <label for="usrname">Username</label> 
-            <input type="text" placeholder="Enter email" name="usrname" id="newusername"> 
+            <input type="text" placeholder="Enter email" name="usrname" id="newusername" required> 
             </br>
             <label for="passwrd">Password</label> 
-            <input type="text" placeholder="Enter password" name="passwrd" id="newpassword">
+            <input type="text" placeholder="Enter password" name="passwrd" id="newpassword" required>
             </br> 
             <button type="submit" id="register-user" class="button">REGISTER</button> 
         </fieldset>       
@@ -332,77 +401,36 @@ function generateSignupPage() {
   `
 } 
 
-
-
-function addNewUser(newUser, callback) { 
-  user = newUser; 
-  callback(); 
-}
-
-
-
-
-function displayLoginPage() {
-  $('main').html(generateLoginPage()); 
-} 
-
 //login page linked from LANDING page 
 function generateLoginPage() {
   return ` 
     <form class="login-form"> 
       <label for="username">Username</label> 
-      <input type="text" id="login-username" name="username" placeholder="Username"> 
+      <input type="text" id="login-username" name="username" placeholder="Username" required> 
       <label for="password">Password</label> 
-      <input type="password" id="login-password" name="password" placeholder="Password"> 
+      <input type="password" id="login-password" name="password" placeholder="Password" required> 
     <button type="submit" id="submit-login">SIGN IN</button> 
     </form> 
   `
 } 
 
-let user = null; 
-
-function validateLogin(credentials) { 
-  user = true; 
-  displayLandingPage(); 
-}; 
-
-function handleLoginSubmit() {
-  $('main').on('submit', '.login-form', function(event) {
-    event.preventDefault(); 
-    const username = $('#login-username').val(); 
-    const password = $('#login-password').val(); 
-    const credentials = {username, password};
-    validateLogin(credentials); 
-    
-  }); 
-}
-
-function displayProfilePage(moods) { 
-  $('main').html(generateProfilePage(moods)); 
-  if (moods.length > 0) {
-  generateGraph(moods); 
-  } 
+function generateSuccessPage(mood) { 
+  const options = {weekday:'long', year:'numeric', month:'short', day:'2-digit', hour:'2-digit', minute:'2-digit'}; 
+  const created = new Date(mood.created); 
+  return `
+    <section id="success">
+      <div class="succes-msg-container">
+        <h2>New mood added</h2>
+        <p>You've just added entry with rating: ${mood.rating} at time: ${created.toLocaleDateString('en-US', options)}</p> 
+      </div>
+      <button id="go-to-profile" type="button">Go to profile</button> 
+    </section>
+  `
 }
 
 
 
-function logout() { 
-  user = null; 
-  displayLandingPage(); 
-}
 
-function displaySignupPage() {
-  $('main').html(generateSignupPage());
-} 
-
-//decides which page to start with
-function displayLandingPage() {
-  if (user) { 
-    getMoodsFromApi(displayProfilePage); 
-  } else {
-    displaySignupPage(); 
-  }
-}
 
 function setupEventHandlers() { 
   handleLoginSubmit(); 
